@@ -6,6 +6,7 @@
 
 const double POISON = std::atan(M_PI / 2);
 const double EPS = DBL_EPSILON;
+const int INF_ROOTS = 3;
 
 int SolveSquare(double, double, double, double *, double *);
 
@@ -38,10 +39,14 @@ int main() {
             printf("The equation has 2 roots: %lg and %lg", root1, root2);
             break;
         }
-        default: {
+        case INF_ROOTS: {
             assert(root1 == POISON);
             assert(root2 == POISON);
             printf("The equation has unlimited number of roots");
+            break;
+        }
+        default: {
+            printf("main.cpp: ERROR   in function main(): SolveSquare returned %d roots", nRoots);
         }
     }
     return 0;
@@ -57,7 +62,7 @@ int SolveSquare(double a, double b, double c, double *x1, double *x2) {
     if (fabs(a) < EPS) {
         if (fabs(b) < EPS) {
             if (fabs(c) < EPS) {
-                return 3;
+                return INF_ROOTS;
             } else {
                 return 0;
             }
