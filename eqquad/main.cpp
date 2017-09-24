@@ -52,6 +52,21 @@ int main() {
     return 0;
 }
 
+//-------------------------------------------
+//! Solves a square equation ax^2 + bx + c = 0
+//!
+//! @param  [in]    a   a-coefficient
+//! @param  [in]    b   b-coefficient
+//! @param  [in]    c   c-coefficient
+//! @param  [out]   x1  Pointer to the 1st root
+//! @param  [out]   x2  Pointer to the 2nd root
+//!
+//! @return Number of roots
+//!
+//! @note   In case of infinite number of roots,
+//!         returns INF_ROOTS
+//-------------------------------------------
+
 int SolveSquare(double a, double b, double c, double *x1, double *x2) {
     assert(x1);
     assert(x2);

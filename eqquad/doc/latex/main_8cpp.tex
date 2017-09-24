@@ -1,0 +1,80 @@
+\hypertarget{main_8cpp}{}\section{eqquad/main.cpp File Reference}
+\label{main_8cpp}\index{eqquad/main.\+cpp@{eqquad/main.\+cpp}}
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$math.\+h$>$}\newline
+{\ttfamily \#include $<$tgmath.\+h$>$}\newline
+{\ttfamily \#include $<$cassert$>$}\newline
+{\ttfamily \#include $<$cfloat$>$}\newline
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{main_8cpp_a2d382fb3362c1b587083dc925d10aab7}{Solve\+Square}} (double, double, double, double $\ast$, double $\ast$)
+\item 
+int \mbox{\hyperlink{main_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}} ()
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const double \mbox{\hyperlink{main_8cpp_a141dd1b85dcc49e521c5bcaa36b27f2b}{P\+O\+I\+S\+ON}} = std\+::atan(M\+\_\+\+PI / 2)
+\item 
+const double \mbox{\hyperlink{main_8cpp_afe01386a82fedc016455a43c20280a97}{E\+PS}} = D\+B\+L\+\_\+\+E\+P\+S\+I\+L\+ON
+\item 
+const int \mbox{\hyperlink{main_8cpp_a3a8fb162f354ec8bda5558af8f61874d}{I\+N\+F\+\_\+\+R\+O\+O\+TS}} = 3
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{main_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}\label{main_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}} 
+\index{main.\+cpp@{main.\+cpp}!main@{main}}
+\index{main@{main}!main.\+cpp@{main.\+cpp}}
+\subsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily int main (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{main_8cpp_a2d382fb3362c1b587083dc925d10aab7}\label{main_8cpp_a2d382fb3362c1b587083dc925d10aab7}} 
+\index{main.\+cpp@{main.\+cpp}!Solve\+Square@{Solve\+Square}}
+\index{Solve\+Square@{Solve\+Square}!main.\+cpp@{main.\+cpp}}
+\subsubsection{\texorpdfstring{Solve\+Square()}{SolveSquare()}}
+{\footnotesize\ttfamily int Solve\+Square (\begin{DoxyParamCaption}\item[{double}]{a,  }\item[{double}]{b,  }\item[{double}]{c,  }\item[{double $\ast$}]{x1,  }\item[{double $\ast$}]{x2 }\end{DoxyParamCaption})}
+
+Solves a square equation ax$^\wedge$2 + bx + c = 0
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em a} & a-\/coefficient \\
+\hline
+\mbox{\tt in}  & {\em b} & b-\/coefficient \\
+\hline
+\mbox{\tt in}  & {\em c} & c-\/coefficient \\
+\hline
+\mbox{\tt out}  & {\em x1} & Pointer to the 1st root \\
+\hline
+\mbox{\tt out}  & {\em x2} & Pointer to the 2nd root\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Number of roots
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+In case of infinite number of roots, returns I\+N\+F\+\_\+\+R\+O\+O\+TS 
+\end{DoxyNote}
+
+
+\subsection{Variable Documentation}
+\mbox{\Hypertarget{main_8cpp_afe01386a82fedc016455a43c20280a97}\label{main_8cpp_afe01386a82fedc016455a43c20280a97}} 
+\index{main.\+cpp@{main.\+cpp}!E\+PS@{E\+PS}}
+\index{E\+PS@{E\+PS}!main.\+cpp@{main.\+cpp}}
+\subsubsection{\texorpdfstring{E\+PS}{EPS}}
+{\footnotesize\ttfamily const double E\+PS = D\+B\+L\+\_\+\+E\+P\+S\+I\+L\+ON}
+
+\mbox{\Hypertarget{main_8cpp_a3a8fb162f354ec8bda5558af8f61874d}\label{main_8cpp_a3a8fb162f354ec8bda5558af8f61874d}} 
+\index{main.\+cpp@{main.\+cpp}!I\+N\+F\+\_\+\+R\+O\+O\+TS@{I\+N\+F\+\_\+\+R\+O\+O\+TS}}
+\index{I\+N\+F\+\_\+\+R\+O\+O\+TS@{I\+N\+F\+\_\+\+R\+O\+O\+TS}!main.\+cpp@{main.\+cpp}}
+\subsubsection{\texorpdfstring{I\+N\+F\+\_\+\+R\+O\+O\+TS}{INF\_ROOTS}}
+{\footnotesize\ttfamily const int I\+N\+F\+\_\+\+R\+O\+O\+TS = 3}
+
+\mbox{\Hypertarget{main_8cpp_a141dd1b85dcc49e521c5bcaa36b27f2b}\label{main_8cpp_a141dd1b85dcc49e521c5bcaa36b27f2b}} 
+\index{main.\+cpp@{main.\+cpp}!P\+O\+I\+S\+ON@{P\+O\+I\+S\+ON}}
+\index{P\+O\+I\+S\+ON@{P\+O\+I\+S\+ON}!main.\+cpp@{main.\+cpp}}
+\subsubsection{\texorpdfstring{P\+O\+I\+S\+ON}{POISON}}
+{\footnotesize\ttfamily const double P\+O\+I\+S\+ON = std\+::atan(M\+\_\+\+PI / 2)}
+
