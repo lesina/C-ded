@@ -24,7 +24,7 @@ int main() {
 
 void sort(int number_of_verses, char verses[][255]) {
     for (int i = 0; i<number_of_verses-1; i++) {
-        if ((std::string)verses[i] > (std::string)verses[i + 1])
+        if (*verses[i] > *verses[i + 1])
             std::swap(verses[i], verses[i + 1]);
     }
 }
