@@ -1,30 +1,34 @@
 #include <iostream>
-#include <gmpxx.h>
+#include <sys/stat.h>
 
-void sort(int, char[][255]);
+long int getFileSize(const char *);
+
+long int getNumberOfCharacters(FILE *);
 
 int main() {
 
     printf("Sorting english version of Zhenya Onegin\n"
-                   "1.0 (c) Lesha\n");
+                   "1.1 (c) Lesha\n");
 
-    int number_of_verses = 0;
-    printf("Enter the number of verses: ");
-    scanf("%d", &number_of_verses);
+    const char *filename = "test";
+    FILE *file = fopen(filename, "rb");
+    long int number_of_characters = getNumberOfCharacters(file);
+    long int size_of_file = getFileSize(filename);
 
-    char verses[number_of_verses][255];
-    printf("Enter the novel:\n");
-    for (int i = 0; i<number_of_verses; i++)
-        scanf("%s", verses[i]);
-
-    sort(number_of_verses, verses);
+    printf("%ld", size_of_file);
 
     return 0;
 }
 
-void sort(int number_of_verses, char verses[][255]) {
-    for (int i = 0; i<number_of_verses-1; i++) {
-        if (*verses[i] > *verses[i + 1])
-            std::swap(verses[i], verses[i + 1]);
+long int getFileSize(const char *filename) {
+    struct stat st;
+    if (stat(filename, &st) != 0) {
+        return 0;
     }
+    return st.st_size;
+}
+
+long int getNumberOfCharacters(FILE *file) {
+    fseek(file, 0, SEEK_END);
+    return ftell(file);
 }
