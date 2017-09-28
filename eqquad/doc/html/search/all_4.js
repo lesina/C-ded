@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['solvesquare',['SolveSquare',['../main_8cpp.html#a2d382fb3362c1b587083dc925d10aab7',1,'main.cpp']]]
+  ['one_5froot',['ONE_ROOT',['../main_8cpp.html#ac10c4274ebf916308a92b062c9dce8c1',1,'main.cpp']]]
 ];

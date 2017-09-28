@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['main',['main',['../main_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4',1,'main.cpp']]],
-  ['main_2ecpp',['main.cpp',['../main_8cpp.html',1,'']]]
+  ['linearsolution',['linearSolution',['../main_8cpp.html#aaf06463efbe3aa71651a39826b00ba48',1,'main.cpp']]]
 ];

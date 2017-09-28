@@ -12,7 +12,6 @@ const int TWO_ROOTS = 2;
 const int INF_ROOTS = 3;
 
 int SolveSquare(double, double, double, double *, double *);
-
 int linearSolution(double, double, double *);
 
 int main() {

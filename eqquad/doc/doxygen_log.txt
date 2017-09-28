@@ -4,9 +4,9 @@
 # Project related configuration options
 #---------------------------------------------------------------------------
 DOXYFILE_ENCODING      = UTF-8
-PROJECT_NAME           = "Square eqation solution"
-PROJECT_NUMBER         = 1.0
-PROJECT_BRIEF          = eqquad
+PROJECT_NAME           = "Solution of square equation"
+PROJECT_NUMBER         = 1.2
+PROJECT_BRIEF          = 
 PROJECT_LOGO           = 
 OUTPUT_DIRECTORY       = /home/les/Desktop/Desktop/c-ded/C-ded/eqquad/doc
 CREATE_SUBDIRS         = NO
