@@ -16,6 +16,10 @@ void list_of_string(char **, char *);
 
 int compare(const void *, const void *);
 
+int compare_from_end(const void *, const void *);
+
+int find(char, char *);
+
 int main() {
 
     printf("Sorting english version of Zhenya Onegin\n"
@@ -40,7 +44,8 @@ int main() {
     char *text[number_of_lines];
 
     list_of_string(text, buf);
-    qsort(text, number_of_lines, sizeof(text[0]), compare);
+    qsort(text, number_of_lines, sizeof(text[0]), compare_from_end);
+    printf("%s", text[1]);
 
     return 0;
 }
@@ -118,11 +123,58 @@ void list_of_string(char **text, char *buf) {
 //! function of comparison strings in qsort
 //!
 //! \param  [in]    a   a-string
-//! \param  [out]   b   b-string
+//! \param  [in]    b   b-string
 //!
 //! \return result of function srtcmp
 //-------------------------------------------
 
 int compare(const void *a, const void *b) {
     return strcmp(*(char **) a, *(char **) b);
+}
+
+//-------------------------------------------
+//! function of comparison strings (from the end) in qsort
+//!
+//! \param  [in]    a   a-string
+//! \param  [in]    b   b-string
+//!
+//! \return 1 if a>b; -1 if a<b; 0 if a==b;
+//-------------------------------------------
+
+int compare_from_end(const void *a, const void *b) {
+    char *first_string = *(char **) a;
+    char *second_string = *(char **) b;
+    int pos_in_end_a = find('\n', first_string) - 1;
+    int pos_in_end_b = find('\n', second_string) - 1;
+    while (pos_in_end_a && pos_in_end_b) {
+        if (first_string[pos_in_end_a] > second_string[pos_in_end_b]) {
+            return 1;
+        } else if (first_string[pos_in_end_a] < second_string[pos_in_end_b]) {
+            return -1;
+        } else {
+            pos_in_end_a--;
+            pos_in_end_b--;
+        }
+    }
+    return pos_in_end_b - pos_in_end_a;
+}
+
+//-------------------------------------------
+//! Finds element in line
+//!
+//! \param  [in]    element what we are looking for
+//! \param  [in]    line    line-text where we are searching the element
+//!
+//! \return position of first meeting with the element in line
+//-------------------------------------------
+
+int find(char element, char *line) {
+    int i = 0;
+    while (line[i]) {
+        if (line[i] == element) {
+            return i;
+        }
+        i++;
+    }
+    return -1;
 }
