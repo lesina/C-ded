@@ -42,10 +42,16 @@ int main() {
     list_of_string(text, buf);
     qsort(text, number_of_lines, sizeof(text[0]), compare);
 
-    printf("%s", text[2]);
-
     return 0;
 }
+
+//-------------------------------------------
+//! Gets size of file in bytes
+//!
+//! @param  [in]    filename    name of file with what we are working
+//!
+//! @return Size of file in bytes
+//-------------------------------------------
 
 long int get_file_size(const char *filename) {
     struct stat st;
@@ -55,10 +61,26 @@ long int get_file_size(const char *filename) {
     return st.st_size;
 }
 
+//-------------------------------------------
+//! Gets number of characters in file
+//!
+//! @param  [in]    file    file-pointer
+//!
+//! @return Number of characters
+//-------------------------------------------
+
 long int get_number_of_characters(FILE *file) {
     fseek(file, 0, SEEK_END);
     return ftell(file);
 }
+
+//-------------------------------------------
+//! Counts lines in text
+//!
+//! @param  [in]    buf    buffer with the whole text and every symbol
+//!
+//! @return Number of lines in text
+//-------------------------------------------
 
 size_t count_lines(const char *buf) {
     size_t number_of_lines = 1, i = 0;
@@ -71,6 +93,15 @@ size_t count_lines(const char *buf) {
     return number_of_lines;
 }
 
+//-------------------------------------------
+//! Makes list of pointers to the begins of every line
+//!
+//! @param  [in]    buf     buffer with the whole text and every symbol
+//! @param  [out]   text    list of pointers to the begins of every line
+//!
+//! @return list of pointers to the begins of every line
+//-------------------------------------------
+
 void list_of_string(char **text, char *buf) {
     int i = 1, line = 1;
     text[0] = buf;
@@ -82,6 +113,15 @@ void list_of_string(char **text, char *buf) {
         i++;
     }
 }
+
+//-------------------------------------------
+//! function of comparison strings in qsort
+//!
+//! \param  [in]    a   a-string
+//! \param  [out]   b   b-string
+//!
+//! \return result of function srtcmp
+//-------------------------------------------
 
 int compare(const void *a, const void *b) {
     return strcmp(*(char **) a, *(char **) b);
