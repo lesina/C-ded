@@ -6,6 +6,10 @@
 #include <fcntl.h>
 #include <cstring>
 
+const char *poem = "test";
+const char *dict = "dict";
+const char *rifm = "rifm";
+
 long int get_file_size(const char *);
 
 long int get_number_of_characters(FILE *);
@@ -20,32 +24,41 @@ int compare_from_end(const void *, const void *);
 
 int find(char, char *);
 
+void write_to_file(char **, size_t, int);
+
 int main() {
 
     printf("Sorting english version of Zhenya Onegin\n"
                    "1.1 (c) Lesha\n");
 
-    const char *filename = "test";
-    FILE *file = fopen(filename, "rb");
-    int fd = open(filename, O_RDONLY);
+    FILE *file = fopen(poem, "rb");
+    int fd = open(poem, O_RDONLY);
     assert(std::isfinite(fd));
     assert(file);
 
     long int number_of_characters = get_number_of_characters(file);
-    long int size_of_file = get_file_size(filename);
+    long int size_of_file = get_file_size(poem);
     assert(std::isfinite(number_of_characters));
     assert(std::isfinite(size_of_file));
 
     char buf[number_of_characters];
     read(fd, buf, size_of_file);
+    close(fd);
+    fclose(file);
 
     size_t number_of_lines = count_lines(buf);
     assert(std::isfinite(number_of_lines));
     char *text[number_of_lines];
 
     list_of_string(text, buf);
+    qsort(text, number_of_lines, sizeof(text[0]), compare);
+    fd = open(dict, O_RDWR | O_CREAT);
+    write_to_file(text, number_of_lines, fd);
+    close(fd);
     qsort(text, number_of_lines, sizeof(text[0]), compare_from_end);
-    printf("%s", text[1]);
+    fd = open(rifm, O_RDWR | O_CREAT);
+    write_to_file(text, number_of_lines, fd);
+    close(fd);
 
     return 0;
 }
@@ -177,4 +190,20 @@ int find(char element, char *line) {
         i++;
     }
     return -1;
+}
+
+//-------------------------------------------
+//! Writes strings to file
+//!
+//! \param  [in]    text            list of string pointers to the begin of every line of peom
+//! \param  [in]    number_of_lines number of strings in text
+//! \param  [in]    fd              file descriptor where we write text
+//!
+//! \return file with text
+//-------------------------------------------
+
+void write_to_file(char **text, size_t number_of_lines, int fd) {
+    for (int i = 0; i < number_of_lines; i++) {
+        write(fd, text[i], find('\n', text[i]) + 1);
+    }
 }
