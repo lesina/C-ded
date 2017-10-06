@@ -17,7 +17,7 @@ void stackDestruct(stack_t *stack);
 
 void stackPush(stack_t *stack, stackElem_t element);
 
-//void stackPop(stack_t *stack);
+stackElem_t stackPop(stack_t *stack);
 
 bool stackOK(stack_t *stack);
 
@@ -28,6 +28,10 @@ void stackResize(stack_t *stack);
 int main() {
     stack_t *stack = (stack_t *) malloc(sizeof(stack_t));
     stackConstruct(stack, 10);
+    stackPush(stack, 5);
+    printf("%lf\n", stackPop(stack));
+    printf("%d\n", stack->count);
+    printf("%d", stack->size);
     stackDestruct(stack);
     return 0;
 }
@@ -53,7 +57,13 @@ void stackPush(stack_t *stack, stackElem_t element) {
     ASSERT_OK();
 }
 
-//void stackPop(stack_t *stack)
+stackElem_t stackPop(stack_t *stack){
+    ASSERT_OK();
+    stackElem_t res = stack->data[stack->count-1];
+    stack->data[(stack->count--)-1] = 0;
+    ASSERT_OK();
+    return res;
+}
 
 bool stackOK(stack_t *stack) {
     return stack && stack->count >= 0 && stack->size > 0 && stack->data;
