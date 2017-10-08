@@ -1,6 +1,7 @@
 #include <iostream>
+#include <cassert>
 
-#define ASSERT_OK() if (!stackOK(stack)) stack_DUMP(stack)
+#define ASSERT_OK() if (!stackOK(stack)) {stack_DUMP(stack); assert(0);}
 #define RED     "\033[1;31m"
 #define RESET   "\033[0m"
 
@@ -36,38 +37,93 @@ int main() {
     return 0;
 }
 
-void stackConstruct(stack_t *stack, int size) {
+//------------------------------
+//! Initializing the stack
+//!
+//! \param stack    pointer to stack
+//! \param size     size of data-array
+//!
+//! \return initialized stack
+//!
+//! \note count - number of the next element, size - size of memory allocated to stack
+//------------------------------
+
+void stackConstruct(stack_t *stack, int size = 1) {
     stack->count = 0;
     stack->size = size;
     stack->data = (stackElem_t *) malloc(stack->size * sizeof(stackElem_t));
-    ASSERT_OK();
+    ASSERT_OK()
 }
+
+//------------------------------
+//! Free the memory of the stack
+//!
+//! \param stack    pointer to stack
+//!
+//! \return memory of the computer
+//------------------------------
 
 void stackDestruct(stack_t *stack) {
     free(stack->data);
     free(stack);
 }
 
+//------------------------------
+//! Pushes the element to the end of stack data
+//!
+//! \param stack    pointer to stack
+//! \param element  element which is pushed to the top of stack
+//!
+//! \return updated stack
+//------------------------------
+
 void stackPush(stack_t *stack, stackElem_t element) {
-    ASSERT_OK();
+    ASSERT_OK()
     stack->data[stack->count++] = element;
     if (stack->count == stack->size) {
         stackResize(stack);
     }
-    ASSERT_OK();
+    ASSERT_OK()
 }
 
-stackElem_t stackPop(stack_t *stack){
-    ASSERT_OK();
-    stackElem_t res = stack->data[stack->count-1];
-    stack->data[(stack->count--)-1] = 0;
-    ASSERT_OK();
+//------------------------------
+//! Pops the element from the end of stack data
+//!
+//! \param stack    pointer to stack
+//!
+//! \return popped element
+//!
+//! \note can't pop the element from stack with count = 0 or less
+//------------------------------
+
+stackElem_t stackPop(stack_t *stack) {
+    ASSERT_OK()
+    assert(stack->count > 0);
+    stackElem_t res = stack->data[stack->count - 1];
+    stack->data[(stack->count--) - 1] = 0;
+    ASSERT_OK()
     return res;
 }
+
+//------------------------------
+//! Checks if the stack is OK
+//!
+//! \param stack    pointer to stack
+//!
+//! \return true, if everything is good; false - if not
+//------------------------------
 
 bool stackOK(stack_t *stack) {
     return stack && stack->count >= 0 && stack->size > 0 && stack->data;
 }
+
+//------------------------------
+//! Prints the dump of stack
+//!
+//! \param stack    pointer to stack
+//!
+//! \return dump of stack
+//------------------------------
 
 void stack_DUMP(stack_t *stack) {
     if (stackOK(stack)) {
@@ -83,7 +139,7 @@ void stack_DUMP(stack_t *stack) {
             printf("stack_t [%#010x] (ERROR!!!)\n{\t", stack);
             if (stack->size > 0) {
                 printf("size = %d\n\t", stack->size);
-                if (stack->count >= 0){
+                if (stack->count >= 0) {
                     printf("data [%d][%s%#010x%s] = {}\n", stack->count, RED, stack->data, RESET);
                 } else {
                     printf("data [%s%d%s][%#010x] = {}\n", RED, stack->count, RESET, stack->data);
@@ -97,6 +153,14 @@ void stack_DUMP(stack_t *stack) {
     }
     printf("}");
 }
+
+//------------------------------
+//! Resizes the stack
+//!
+//! \param stack    pointer to stack
+//!
+//! \return Updated stack
+//------------------------------
 
 void stackResize(stack_t *stack) {
     stack->size *= 2;
