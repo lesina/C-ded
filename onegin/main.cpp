@@ -1,8 +1,10 @@
 #include <iostream>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <assert.h>
 #include <fcntl.h>
 #include <cstring>
+#include "rfile.h"
 
 #define FD_ERROR_OPEN(fd) if (fd == -1) { perror("open"); exit(-1); }
 
@@ -14,10 +16,6 @@ struct Verse {
     char *text;
     size_t length_of_verse = 0;
 };
-
-long int get_file_size(int);
-
-size_t count_lines(const char *);
 
 void list_of_string(Verse [], char *);
 
@@ -40,7 +38,9 @@ int main() {
 
     long int size_of_file = get_file_size(fd);
 
-    char buf[size_of_file];
+    char *buf = (char *) calloc(size_of_file + 1, sizeof(char));
+    assert(buf);
+
     read(fd, buf, size_of_file);
     close(fd);
 
@@ -56,41 +56,6 @@ int main() {
 }
 
 //-------------------------------------------
-//! Gets size of file in bytes
-//!
-//! @param  [in]    fd    file descriptor
-//!
-//! @return Size of file in bytes
-//-------------------------------------------
-
-long int get_file_size(int fd) {
-    struct stat st;
-    if (fstat(fd, &st) != 0) {
-        return 0;
-    }
-    return st.st_size;
-}
-
-//-------------------------------------------
-//! Counts lines in text
-//!
-//! @param  [in]    buf    buffer with the whole text and every symbol
-//!
-//! @return Number of lines in text
-//-------------------------------------------
-
-size_t count_lines(const char *buf) {
-    size_t number_of_lines = 1, i = 0;
-    while (buf[i]) {
-        if (buf[i] == '\n') {
-            number_of_lines++;
-        }
-        i++;
-    }
-    return number_of_lines;
-}
-
-//-------------------------------------------
 //! Makes list of pointers to the begins of every line
 //!
 //! @param  [in]    buf     buffer with the whole text and every symbol
@@ -100,9 +65,12 @@ size_t count_lines(const char *buf) {
 //-------------------------------------------
 
 void list_of_string(Verse verse[], char *buf) {
+    assert(buf);
+
     int i = 0, line = 1;
     size_t length = 1;
     verse[0].text = buf;
+
     while (buf[i]) {
         if (buf[i] == '\n') {
             verse[line].text = buf + i + 1;
@@ -113,6 +81,7 @@ void list_of_string(Verse verse[], char *buf) {
         length++;
         i++;
     }
+
     verse[line - 1].length_of_verse = length;
 }
 
@@ -126,6 +95,8 @@ void list_of_string(Verse verse[], char *buf) {
 //-------------------------------------------
 
 int compare(const void *a, const void *b) {
+    assert(a);
+    assert(b);
     return strcmp(((Verse *) a)->text, ((Verse *) b)->text);
 }
 
@@ -139,10 +110,15 @@ int compare(const void *a, const void *b) {
 //-------------------------------------------
 
 int compare_from_end(const void *a, const void *b) {
+    assert(a);
+    assert(b);
+
     Verse *first_verse = (Verse *) a;
     Verse *second_verse = (Verse *) b;
+
     int pos_in_end_a = first_verse->length_of_verse;
     int pos_in_end_b = second_verse->length_of_verse;
+
     while (pos_in_end_a && pos_in_end_b) {
         if (first_verse->text[pos_in_end_a] > second_verse->text[pos_in_end_b]) {
             return 1;
@@ -153,6 +129,7 @@ int compare_from_end(const void *a, const void *b) {
             pos_in_end_b--;
         }
     }
+
     return pos_in_end_b - pos_in_end_a;
 }
 
@@ -167,6 +144,8 @@ int compare_from_end(const void *a, const void *b) {
 //-------------------------------------------
 
 void write_to_file(Verse *verse, size_t number_of_lines, int fd) {
+    assert(verse);
+
     for (int i = 0; i < number_of_lines; i++) {
         write(fd, verse[i].text, verse[i].length_of_verse + 1);
     }
@@ -184,6 +163,10 @@ void write_to_file(Verse *verse, size_t number_of_lines, int fd) {
 //-------------------------------------------
 
 void sorted_writef(const char *filename, Verse *verse, size_t number_of_lines, int (*cmp)(const void *, const void *)) {
+    assert(filename);
+    assert(verse);
+    assert(cmp);
+
     qsort(verse, number_of_lines, sizeof(verse[0]), cmp);
     int fd = open(filename, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
     FD_ERROR_OPEN(fd);
