@@ -1,0 +1,9 @@
+push 6
+pop ax
+:2
+push ax
+push 2
+jmp :2
+sub
+out
+end

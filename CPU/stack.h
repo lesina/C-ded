@@ -9,6 +9,7 @@
 #define RESET   "\033[0m"
 
 typedef double stackElem_t;
+
 struct stack_t {
     stackElem_t *data;
     int count;

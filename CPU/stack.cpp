@@ -27,6 +27,7 @@ void stackConstruct(stack_t *stack, int size = 1) {
 //------------------------------
 
 void stackDestruct(stack_t *stack) {
+    ASSERT_OK()
     free(stack->data);
     free(stack);
 }
@@ -89,12 +90,13 @@ bool stackOK(stack_t *stack) {
 //------------------------------
 
 void stack_DUMP(stack_t *stack) {
+    ASSERT_OK()
     if (stackOK(stack)) {
         printf("stack_t [%#010x] \n{\t", stack);
         printf("size = %d\n\t", stack->size);
         printf("data [%d][%#010x] = {\n\t\t", stack->count, stack->data);
         for (int i = 0; i < stack->count; i++) {
-            printf("[%d] = %lf\n\t\t", i, stack->data[i]); //TODO: MAKE IT FOR STACK_ELEM_T
+            printf("[%d] = %lf\n\t\t", i, stack->data[i]);
         }
         printf("}\n");
     } else {
@@ -126,6 +128,8 @@ void stack_DUMP(stack_t *stack) {
 //------------------------------
 
 void stackResize(stack_t *stack) {
+    ASSERT_OK()
     stack->size *= 2;
-    realloc(stack->data, stack->size * sizeof(stackElem_t));
+    stack->data = (stackElem_t *) realloc(stack->data, stack->size * sizeof(stackElem_t));
+    ASSERT_OK()
 }

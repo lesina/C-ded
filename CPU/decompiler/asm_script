@@ -1,5 +1,5 @@
 push 6
-push 2
+push ax
 sub
 out
 end
