@@ -7,9 +7,12 @@
 #include "rfile.h"
 
 #define FD_ERROR_OPEN(fd) if (fd == -1) { perror("open"); exit(-1); }
+#define CMD_DEF(name, num) else if (!strcmp(pch, #name)) { x = num; write(fd_write, &x, 1); }
+#define JMP_DEF(name, num) else if (!strcmp(pch, #name)) { x = num; write(fd_write, &x, 1); pch = strtok(NULL, " \n@");\
+if (!tags[atoi(pch + 1)]) {printf("Tag %d is not existed\n", atoi(pch + 1));exit(-1);}write(fd_write, &tags[atoi(pch + 1)], 4);}
 
 const char *computer_commands = "comp";
-const int MAX_N_TAGS = 65536;
+const int MAX_TAG = 2147483647;
 
 void write_to_file(int *, char *);
 
@@ -17,7 +20,8 @@ void collect_tags(int *, char *);
 
 int main() {
     printf("Please, enter the name of asm script: ");
-    char *file_script = (char *) malloc(FILENAME_MAX);
+    char *file_script = (char *) calloc(FILENAME_MAX, 1);
+    assert(file_script);
     scanf("%s", file_script);
 
     errno = 0;
@@ -27,13 +31,14 @@ int main() {
     long int size_of_file = get_file_size(fd_read);
 
     char *buf = (char *) calloc(size_of_file, sizeof(char));
+    assert(buf);
 
     read(fd_read, buf, size_of_file);
     close(fd_read);
-    int *tags = (int *) calloc(MAX_N_TAGS, sizeof(int));
+    int *tags = (int *) calloc(MAX_TAG, sizeof(int));
+    assert(tags);
     collect_tags(tags, buf);
 
-    //TODO: WTF???? I should reread this shit!
     fd_read = open(file_script, O_RDONLY);
     FD_ERROR_OPEN(fd_read);
 
@@ -57,116 +62,65 @@ void write_to_file(int *tags, char *buf) {
     FD_ERROR_OPEN(fd_write);
 
     char *tag = (char *) calloc(5, sizeof(char));
+    assert(tag);
+    int x;
     bool has_no_end = true;
     char *pch = strtok(buf, " \n@");
     while (pch != NULL) {
         if (!strcmp(pch, "push")) {
-            write(fd_write, "1", 1);
             pch = strtok(NULL, " \n@");
             if (!strcmp(pch, "ax")) {
-                write(fd_write, "0 51", 4);
+                x = 10;
+                write(fd_write, &x, 1);
+                x = 51;
+                write(fd_write, &x, 4);
             } else if (!strcmp(pch, "bx")) {
-                write(fd_write, "0 52", 4);
+                x = 10;
+                write(fd_write, &x, 1);
+                x = 52;
+                write(fd_write, &x, 4);
             } else if (!strcmp(pch, "cx")) {
-                write(fd_write, "0 53", 4);
+                x = 10;
+                write(fd_write, &x, 1);
+                x = 53;
+                write(fd_write, &x, 4);
             } else if (!strcmp(pch, "dx")) {
-                write(fd_write, "0 54", 4);
+                x = 10;
+                write(fd_write, &x, 1);
+                x = 54;
+                write(fd_write, &x, 4);
             } else {
-                write(fd_write, " ", 1);
-                write(fd_write, pch, strlen(pch));
+                x = 1;
+                write(fd_write, &x, 1);
+                x = atoi(pch);
+                write(fd_write, &x, 4);
             }
-            write(fd_write, "\n", 1);
         } else if (!strcmp(pch, "pop")) {
-            write(fd_write, "20", 2);
+            x = 20;
+            write(fd_write, &x, 1);
             pch = strtok(NULL, " \n@");
             if (!strcmp(pch, "ax")) {
-                write(fd_write, " 51", 3);
+                x = 51;
+                write(fd_write, &x, 4);
             } else if (!strcmp(pch, "bx")) {
-                write(fd_write, " 52", 3);
+                x = 52;
+                write(fd_write, &x, 4);
             } else if (!strcmp(pch, "cx")) {
-                write(fd_write, " 53", 3);
+                x = 53;
+                write(fd_write, &x, 4);
             } else if (!strcmp(pch, "dx")) {
-                write(fd_write, " 54", 3);
+                x = 54;
+                write(fd_write, &x, 4);
             }
-            write(fd_write, "\n", 1);
-        } else if (!strcmp(pch, "jmp")) {
-            write(fd_write, "60 ", 3);
-            pch = strtok(NULL, " \n@");
-            snprintf(tag, sizeof(tag), "%d", tags[atoi(pch + 1)]);
-            write(fd_write, tag, strlen(tag));
-            write(fd_write, "\n", 1);
-        } else if (!strcmp(pch, "je")) {
-            write(fd_write, "61 ", 3);
-            pch = strtok(NULL, " \n@");
-            snprintf(tag, sizeof(tag), "%d", tags[atoi(pch + 1)]);
-            write(fd_write, tag, strlen(tag));
-            write(fd_write, "\n", 1);
-        } else if (!strcmp(pch, "jne")) {
-            write(fd_write, "62 ", 3);
-            pch = strtok(NULL, " \n@");
-            snprintf(tag, sizeof(tag), "%d", tags[atoi(pch + 1)]);
-            write(fd_write, tag, strlen(tag));
-            write(fd_write, "\n", 1);
-        } else if (!strcmp(pch, "jae")) {
-            write(fd_write, "63 ", 3);
-            pch = strtok(NULL, " \n@");
-            snprintf(tag, sizeof(tag), "%d", tags[atoi(pch + 1)]);
-            write(fd_write, tag, strlen(tag));
-            write(fd_write, "\n", 1);
-        } else if (!strcmp(pch, "ja")) {
-            write(fd_write, "64 ", 3);
-            pch = strtok(NULL, " \n@");
-            snprintf(tag, sizeof(tag), "%d", tags[atoi(pch + 1)]);
-            write(fd_write, tag, strlen(tag));
-            write(fd_write, "\n", 1);
-        } else if (!strcmp(pch, "jb")) {
-            write(fd_write, "65 ", 3);
-            pch = strtok(NULL, " \n@");
-            snprintf(tag, sizeof(tag), "%d", tags[atoi(pch + 1)]);
-            write(fd_write, tag, strlen(tag));
-            write(fd_write, "\n", 1);
-        } else if (!strcmp(pch, "jbe")) {
-            write(fd_write, "66 ", 3);
-            pch = strtok(NULL, " \n@");
-            snprintf(tag, sizeof(tag), "%d", tags[atoi(pch + 1)]);
-            write(fd_write, tag, strlen(tag));
-            write(fd_write, "\n", 1);
-        } else if (!strcmp(pch, "call")) {
-            write(fd_write, "70 ", 3);
-            pch = strtok(NULL, " \n@");
-            snprintf(tag, sizeof(tag), "%d", tags[atoi(pch + 1)]);
-            write(fd_write, tag, strlen(tag));
-            write(fd_write, "\n", 1);
-        } else if (!strcmp(pch, "ret")) {
-            write(fd_write, "71 ", 3);
-            write(fd_write, "\n", 1);
-        } else if (!strcmp(pch, "mul")) {
-            write(fd_write, "2", 1);
-            write(fd_write, "\n", 1);
-        } else if (!strcmp(pch, "sub")) {
-            write(fd_write, "3", 1);
-            write(fd_write, "\n", 1);
-        } else if (!strcmp(pch, "sqrt")) {
-            write(fd_write, "4", 1);
-            write(fd_write, "\n", 1);
-        } else if (!strcmp(pch, "add")) {
-            write(fd_write, "5", 1);
-            write(fd_write, "\n", 1);
-        } else if (!strcmp(pch, "div")) {
-            write(fd_write, "6", 1);
-            write(fd_write, "\n", 1);
-        } else if (!strcmp(pch, "sin")) {
-            write(fd_write, "7", 1);
-            write(fd_write, "\n", 1);
-        } else if (!strcmp(pch, "cos")) {
-            write(fd_write, "8", 1);
-            write(fd_write, "\n", 1);
-        } else if (!strcmp(pch, "out")) {
-            write(fd_write, "9", 1);
-            write(fd_write, "\n", 1);
-        } else if (!strcmp(pch, "end")) {
-            write(fd_write, "100", 3);
-            write(fd_write, "\n", 1);
+        }
+
+#include "compiler.h"
+#undef CMD_DEF
+#undef JMP_DEF
+
+        else if (!strcmp(pch, "end")) {
+            x = 100;
+            write(fd_write, &x, 1);
             has_no_end = false;
         }
         pch = strtok(NULL, " \n@");
@@ -197,8 +151,14 @@ void collect_tags(int *tags, char *buf) {
         char *ptr = strstr(pch, ":");
         if (pch == ptr) {
             tag = atoi(ptr + 1);
+            if (tag > MAX_TAG) {
+                printf("MAX TAG IS 255");
+                exit(-1);
+            }
             tags[tag] = cmdCount;
-        } else if (strstr(pch, "push") || strstr(pch, "pop")) {
+        } else if (strstr(pch, "push") || strstr(pch, "pop") || strstr(pch, "jmp") || strstr(pch, "je") ||
+                strstr(pch, "jne") || strstr(pch, "ja") || strstr(pch, "jae") || strstr(pch, "jb") ||
+                strstr(pch, "jbe") || strstr(pch, "call")) {
             cmdCount += 2;
         } else {
             cmdCount++;

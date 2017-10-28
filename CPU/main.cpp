@@ -1,53 +1,72 @@
 #include <iostream>
 #include <tgmath.h>
+#include <fcntl.h>
+#include <zconf.h>
 #include "stack.h"
 #include "rfile.h"
 
-#define PUSH 1
-#define MUL 2
-#define SUB 3
-#define SQRT 4
-#define ADD 5
-#define DIV 6
-#define SIN 7
-#define COS 8
-#define OUT 9
-#define END 100
-#define PUSH_X 10
-#define AX 51
-#define BX 52
-#define CX 53
-#define DX 54
-#define POP 20
-#define JMP 60
-#define JE 61
-#define JNE 62
-#define JAE 63
-#define JA 64
-#define JB 65
-#define JBE 66
-#define CALL 70
-#define RET 71
+#define FILE_OPEN_READ(fp) if (!fp) {perror("open"); exit(-1);}
+
+enum cmd {
+    PUSH = 1,
+    MUL,
+    SUB,
+    SQRT,
+    ADD,
+    DIV,
+    SIN,
+    COS,
+    OUT,
+    PUSH_X,
+    AX = 51,
+    BX,
+    CX,
+    DX,
+    POP = 20,
+    JMP = 60,
+    JE,
+    JNE,
+    JAE,
+    JA,
+    JB,
+    JBE,
+    CALL = 70,
+    RET,
+    END = 100
+};
+
+struct CPU {
+    int cmd_pointer = 0;
+    stack_t *data_stack = NULL;
+    stack_t *return_stack = NULL;
+};
 
 const char *computer_code = "comp";
 const double POISON = atan(M_PI / 2);
 
 void file_to_array(int *, FILE *);
 
-void run_the_executor(stack_t *, int *);
+void run_the_executor(CPU *, int *);
+
+CPU *cpuConstruct(CPU *);
+
+void cpuDestruct(CPU *);
 
 int main() {
-    stack_t *stack = (stack_t *) malloc(sizeof(stack_t));
-    stackConstruct(stack, 10);
+    CPU *cpu = NULL;
+    cpu = cpuConstruct(cpu);
 
-    FILE *script = fopen(computer_code, "r");
+    errno = 0;
+    FILE *script = fopen(computer_code, "rb");
+    FILE_OPEN_READ(script)
     int *code = (int *) calloc(get_file_size(script), sizeof(int));
+    assert(code);
     file_to_array(code, script);
     fclose(script);
 
-    run_the_executor(stack, code);
+    run_the_executor(cpu, code);
 
-    stackDestruct(stack);
+    cpuDestruct(cpu);
     return 0;
 }
 
@@ -65,149 +84,185 @@ void file_to_array(int *code, FILE *script) {
     assert(code);
     int count = 0;
     int command = 0;
-    fscanf(script, "%d", &command);
-    while (command != END) {
+    do {
+        fread(&command, 1, 1, script);
         code[count] = command;
         count += 1;
-        fscanf(script, "%d", &command);
-    }
-    code[count] = command;
+        if (command == PUSH || command == PUSH_X || command == POP || (command >= JMP && command <= JBE) ||
+            command == CALL) {
+            fread(&command, 4, 1, script);
+            code[count] = command;
+            count += 1;
+        }
+    } while (command != END);
 }
 
 //------------------------------
 //! Executes the asm script
 //!
-//! \param  stack   pointer to stack
+//! \param  cpu   pointer to stack
 //! \param  code    pointer to computer code
 //!
 //! \return result of execution the script
 //------------------------------
 
-void run_the_executor(stack_t *stack, int *code) {
-    assert(stack);
+void run_the_executor(CPU *cpu, int *code) {
+    assert(cpu);
     assert(code);
-    stack_t *ret = (stack_t *) malloc(sizeof(stack_t));
-    stackConstruct(stack, 10);
     double ax = POISON, bx = POISON, cx = POISON, dx = POISON;
-    int cmdCount = 0;
-    while (code[cmdCount] != END) {
-        switch (code[cmdCount]) {
+    while (code[cpu->cmd_pointer] != END) {
+        switch (code[cpu->cmd_pointer]) {
             case PUSH:
-                stackPush(stack, code[cmdCount + 1]);
-                cmdCount += 2;
+                stackPush(cpu->data_stack, code[cpu->cmd_pointer + 1]);
+                cpu->cmd_pointer += 2;
                 break;
             case PUSH_X:
-                switch (code[cmdCount + 1]) {
+                switch (code[cpu->cmd_pointer + 1]) {
                     case AX:
                         assert(ax != POISON);
                         assert(std::isfinite(ax));
-                        stackPush(stack, ax);
+                        stackPush(cpu->data_stack, ax);
                         break;
                     case BX:
                         assert(bx != POISON);
                         assert(std::isfinite(bx));
-                        stackPush(stack, bx);
+                        stackPush(cpu->data_stack, bx);
                         break;
                     case CX:
                         assert(cx != POISON);
                         assert(std::isfinite(cx));
-                        stackPush(stack, cx);
+                        stackPush(cpu->data_stack, cx);
                         break;
                     case DX:
                         assert(dx != POISON);
                         assert(std::isfinite(dx));
-                        stackPush(stack, dx);
+                        stackPush(cpu->data_stack, dx);
                         break;
                     default:
-                        printf("SOMETHING WENT WRONG! No such register %d", code[cmdCount + 1]);
+                        printf("SOMETHING WENT WRONG! No such register %d", code[cpu->cmd_pointer + 1]);
                         assert(0);
                 }
-                cmdCount += 2;
+                cpu->cmd_pointer += 2;
                 break;
             case JMP:
-                cmdCount = code[cmdCount + 1];
+                cpu->cmd_pointer = code[cpu->cmd_pointer + 1];
                 break;
             case JE:
-                if (stackPop(stack) == stackPop(stack)) cmdCount = code[cmdCount + 1];
+                if (stackPop(cpu->data_stack) == stackPop(cpu->data_stack))
+                    cpu->cmd_pointer = code[cpu->cmd_pointer + 1];
                 break;
             case JNE:
-                if (stackPop(stack) == stackPop(stack)) cmdCount = code[cmdCount + 1];
+                if (stackPop(cpu->data_stack) != stackPop(cpu->data_stack))
+                    cpu->cmd_pointer = code[cpu->cmd_pointer + 1];
                 break;
             case JAE:
-                if (stackPop(stack) <= stackPop(stack)) cmdCount = code[cmdCount + 1];
+                if (stackPop(cpu->data_stack) <= stackPop(cpu->data_stack))
+                    cpu->cmd_pointer = code[cpu->cmd_pointer + 1];
                 break;
             case JA:
-                if (stackPop(stack) < stackPop(stack)) cmdCount = code[cmdCount + 1];
+                if (stackPop(cpu->data_stack) < stackPop(cpu->data_stack))
+                    cpu->cmd_pointer = code[cpu->cmd_pointer + 1];
                 break;
             case JB:
-                if (stackPop(stack) > stackPop(stack)) cmdCount = code[cmdCount + 1];
+                if (stackPop(cpu->data_stack) > stackPop(cpu->data_stack))
+                    cpu->cmd_pointer = code[cpu->cmd_pointer + 1];
                 break;
             case JBE:
-                if (stackPop(stack) >= stackPop(stack)) cmdCount = code[cmdCount + 1];
+                if (stackPop(cpu->data_stack) >= stackPop(cpu->data_stack))
+                    cpu->cmd_pointer = code[cpu->cmd_pointer + 1];
                 break;
             case CALL:
-                stackPush(ret, cmdCount + 2);
-                cmdCount = code[cmdCount + 1];
+                stackPush(cpu->return_stack, cpu->cmd_pointer + 2);
+                cpu->cmd_pointer = code[cpu->cmd_pointer + 1];
                 break;
             case RET:
-                cmdCount = (int) stackPop(ret);
+                cpu->cmd_pointer = (int) stackPop(cpu->return_stack);
                 break;
             case POP:
-                switch (code[cmdCount + 1]) {
+                switch (code[cpu->cmd_pointer + 1]) {
                     case AX:
-                        ax = stackPop(stack);
+                        ax = stackPop(cpu->data_stack);
                         break;
                     case BX:
-                        bx = stackPop(stack);
+                        bx = stackPop(cpu->data_stack);
                         break;
                     case CX:
-                        cx = stackPop(stack);
+                        cx = stackPop(cpu->data_stack);
                         break;
                     case DX:
-                        dx = stackPop(stack);
+                        dx = stackPop(cpu->data_stack);
                         break;
                     default:
-                        printf("SOMETHING WENT WRONG! No such register %d", code[cmdCount + 1]);
+                        printf("SOMETHING WENT WRONG! No such register %d", code[cpu->cmd_pointer + 1]);
                         assert(0);
                 }
-                cmdCount += 2;
+                cpu->cmd_pointer += 2;
                 break;
             case MUL:
-                stackPush(stack, stackPop(stack) * stackPop(stack));
-                cmdCount += 1;
+                stackPush(cpu->data_stack, stackPop(cpu->data_stack) * stackPop(cpu->data_stack));
+                cpu->cmd_pointer += 1;
                 break;
             case SUB:
-                stackPush(stack, -(stackPop(stack) - stackPop(stack)));
-                cmdCount += 1;
+                stackPush(cpu->data_stack, -(stackPop(cpu->data_stack) - stackPop(cpu->data_stack)));
+                cpu->cmd_pointer += 1;
                 break;
             case SQRT:
-                stackPush(stack, sqrt(stackPop(stack)));
-                cmdCount += 1;
+                stackPush(cpu->data_stack, sqrt(stackPop(cpu->data_stack)));
+                cpu->cmd_pointer += 1;
                 break;
             case ADD:
-                stackPush(stack, stackPop(stack) + stackPop(stack));
-                cmdCount += 1;
+                stackPush(cpu->data_stack, stackPop(cpu->data_stack) + stackPop(cpu->data_stack));
+                cpu->cmd_pointer += 1;
                 break;
             case DIV:
-                stackPush(stack, 1.0 / stackPop(stack) * stackPop(stack));
-                cmdCount += 1;
+                stackPush(cpu->data_stack, 1.0 / stackPop(cpu->data_stack) * stackPop(cpu->data_stack));
+                cpu->cmd_pointer += 1;
                 break;
             case SIN:
-                stackPush(stack, sin(stackPop(stack)));
-                cmdCount += 1;
+                stackPush(cpu->data_stack, sin(stackPop(cpu->data_stack)));
+                cpu->cmd_pointer += 1;
                 break;
             case COS:
-                stackPush(stack, cos(stackPop(stack)));
-                cmdCount += 1;
+                stackPush(cpu->data_stack, cos(stackPop(cpu->data_stack)));
+                cpu->cmd_pointer += 1;
                 break;
             case OUT:
-                printf("%lf", stackPop(stack));
-                cmdCount += 1;
+                printf("%lf", stackPop(cpu->data_stack));
+                cpu->cmd_pointer += 1;
                 break;
             default:
-                printf("SOMETHING WENT WRONG! The command is %d", code[cmdCount]);
+                printf("SOMETHING WENT WRONG! The command is %d", code[cpu->cmd_pointer]);
                 assert(0);
         }
     }
-    stackDestruct(stack);
+}
+
+//------------------------------
+//! Initializing the CPU
+//!
+//! \param cpu    pointer to CPU
+//!
+//! \return initialized cpu
+//------------------------------
+
+CPU *cpuConstruct(CPU *cpu) {
+    cpu = (CPU *) calloc(1, sizeof(CPU));
+    assert(cpu);
+    cpu->data_stack = stackConstruct(cpu->data_stack, 10);
+    cpu->return_stack = stackConstruct(cpu->return_stack, 10);
+    return cpu;
+}
+
+//------------------------------
+//! Free the memory of the cpu
+//!
+//! \param cpu    pointer to cpu
+//!
+//! \return memory of the computer
+//------------------------------
+
+void cpuDestruct(CPU *cpu) {
+    stackDestruct(cpu->data_stack);
+    stackDestruct(cpu->return_stack);
+    free(cpu);
 }

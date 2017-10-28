@@ -3,7 +3,9 @@ pop ax
 :2
 push ax
 push 2
-jmp :2
 sub
+push 4
+je :2
+push 1
 out
 end

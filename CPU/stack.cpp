@@ -11,11 +11,13 @@
 //! \note count - number of the next element, size - size of memory allocated to stack
 //------------------------------
 
-void stackConstruct(stack_t *stack, int size = 1) {
+stack_t *stackConstruct(stack_t *stack, int size = 1) {
+    stack = (stack_t *) calloc(1, sizeof(stack_t));
     stack->count = 0;
     stack->size = size;
     stack->data = (stackElem_t *) malloc(stack->size * sizeof(stackElem_t));
     ASSERT_OK()
+    return stack;
 }
 
 //------------------------------
@@ -90,7 +92,6 @@ bool stackOK(stack_t *stack) {
 //------------------------------
 
 void stack_DUMP(stack_t *stack) {
-    ASSERT_OK()
     if (stackOK(stack)) {
         printf("stack_t [%#010x] \n{\t", stack);
         printf("size = %d\n\t", stack->size);

@@ -16,7 +16,7 @@ struct stack_t {
     int size;
 };
 
-void stackConstruct(stack_t *stack, int size);
+stack_t *stackConstruct(stack_t *stack, int size);
 
 void stackDestruct(stack_t *stack);
 
