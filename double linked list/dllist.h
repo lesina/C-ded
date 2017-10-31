@@ -11,6 +11,23 @@ struct node {
     node *next, *prev;
 };
 
+//typedef struct node iter;
+//
+//iter *list_first(list_t *list);
+//bool is_last_list(list_t *list, iter *cur);
+//iter *next_node(list_t *list, iter *cur);
+//
+//#define for_each_node() \
+//    for ()
+//
+//struct student {
+//    int age;
+//    char *name;
+//    age_list_t alist;
+//    name_list_t nlist;
+//};
+
+
 struct list_t {
     node *head, *tail;
 };
