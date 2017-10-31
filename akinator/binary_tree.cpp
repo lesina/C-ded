@@ -75,7 +75,6 @@ node *nodeConstruct(node *elem, double data) {
 //-----------------------------------------
 
 void treeDestruct(binTree *tree) {
-    ASSERT_OK(tree)
     node *elem = tree->root;
     if (!elem) return;
     tree->root = elem->left;
@@ -117,7 +116,7 @@ void printTree(binTree *tree) {
 //-----------------------------------------
 
 void treePush(binTree *tree, node *newNode) {
-    ASSERT_OK(tree)
+    assert(tree);
     node *elem = tree->root;
     if (newNode->data <= elem->data) {
         if (elem->left == NULL) {
@@ -137,7 +136,6 @@ void treePush(binTree *tree, node *newNode) {
         }
     }
     tree->root = elem;
-    ASSERT_OK(tree)
 }
 
 //-----------------------------------------

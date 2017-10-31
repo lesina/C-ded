@@ -1,7 +1,7 @@
 #ifndef AKINATOR_BINARY_TREE_H
 #define AKINATOR_BINARY_TREE_H
 
-#define ASSERT_OK(tree) if (!treeOK(tree)) { tree->counter = 0; treeDUMP(tree); exit(-1); }
+#define ASSERT_OK(tree) if (!treeOK(tree)) { tree->counter = 0; treeDUMP(tree); exit(-1); } else {tree->counter = 0;}
 
 const int MAX_STR = 20;
 const int MAX_GRAPH = 40000;
