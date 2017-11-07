@@ -1,18 +1,23 @@
 #include <iostream>
+#include <cstring>
+#include <cassert>
 #include "binary_tree.h"
+#include "akinator.h"
 
 int main() {
     binTree *tree = NULL;
-    tree = treeConstruct(tree, 5);
+    tree = makeTree(tree);
 
-    treePush(tree, 1);
-    treePush(tree, 3);
-    treePush(tree, 2);
-    treePush(tree, 4);
-    treePush(tree, 7);
-    treePush(tree, 8);
-    treePush(tree, 9);
-    treePush(tree, 6);
+    while (true) {
+        char *answer = (char *) calloc(MAX_LEN, sizeof(char));
+        assert(answer);
+        game(tree);
+        printf("Play again? (yes/no) ");
+        scanf("%s", answer);
+        if (!strcmp(answer, "no")) {
+            break;
+        }
+    }
 
     treeDUMP(tree);
     treeDestruct(tree);

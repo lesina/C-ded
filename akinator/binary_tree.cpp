@@ -26,7 +26,7 @@ binTree *treeConstruct(binTree *tree) {
 //! \return tree with allocated memory
 //---------------------------------------
 
-binTree *treeConstruct(binTree *tree, double data) {
+binTree *treeConstruct(binTree *tree, nodeType data) {
     tree = (binTree *) calloc(1, sizeof(binTree));
     assert(tree);
     tree->root = nodeConstruct(tree->root, data);
@@ -59,7 +59,7 @@ binTree *treeConstruct(binTree *tree, node *elem) {
 //! \return node with data
 //-------------------------------------------
 
-node *nodeConstruct(node *elem, double data) {
+node *nodeConstruct(node *elem, nodeType data) {
     elem = (node *) calloc(1, sizeof(node));
     assert(elem);
     elem->data = data;
@@ -82,6 +82,7 @@ void treeDestruct(binTree *tree) {
     tree->root = elem->right;
     treeDestruct(tree);
     tree->root = elem;
+    free(elem->data);
     free(elem);
     tree->counter++;
     if (tree->counter == tree->number_of_nodes) {
@@ -101,7 +102,7 @@ void printTree(binTree *tree) {
     if (!elem) return;
     tree->root = elem->left;
     printTree(tree);
-    printf("%lf ", elem->data);
+    printf("%s ", elem->data);
     tree->root = elem->right;
     printTree(tree);
     tree->root = elem;
@@ -145,12 +146,9 @@ void treePush(binTree *tree, node *newNode) {
 //! \note the algorithm is recursive
 //-----------------------------------------
 
-void treePush(binTree *tree, double data) {
+void treePush(binTree *tree, nodeType data) {
     ASSERT_OK(tree)
-    node *elem = (node *) calloc(1, sizeof(node));
-    elem->data = data;
-    elem->left = NULL;
-    elem->right = NULL;
+    node *elem = nodeConstruct(elem, data);
     treePush(tree, elem);
 }
 
@@ -206,19 +204,19 @@ void collectTree(binTree *tree, char *dump) {
     char *str = (char *) calloc(MAX_STR, sizeof(char));
     if (!elem) return;
     if (elem->left) {
-        sprintf(str, "%.2lf", elem->data);
-        strncat(dump, str, MAX_GRAPH);
+//        sprintf(str, "%.2lf", elem->data);
+        strncat(dump, elem->data, MAX_GRAPH);
         strncat(dump, "->", MAX_GRAPH);
-        sprintf(str, "%.2lf", elem->left->data);
-        strncat(dump, str, MAX_GRAPH);
+//        sprintf(str, "%.2lf", elem->left->data);
+        strncat(dump, elem->left->data, MAX_GRAPH);
         strncat(dump, "\n", MAX_GRAPH);
     }
     if (elem->right) {
-        sprintf(str, "%.2lf", elem->data);
-        strncat(dump, str, MAX_GRAPH);
+//        sprintf(str, "%.2lf", elem->data);
+        strncat(dump, elem->data, MAX_GRAPH);
         strncat(dump, "->", MAX_GRAPH);
-        sprintf(str, "%.2lf", elem->right->data);
-        strncat(dump, str, MAX_GRAPH);
+//        sprintf(str, "%.2lf", elem->right->data);
+        strncat(dump, elem->right->data, MAX_GRAPH);
         strncat(dump, "\n", MAX_GRAPH);
     }
     tree->root = elem->left;

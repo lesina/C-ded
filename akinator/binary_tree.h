@@ -6,8 +6,9 @@
 const int MAX_STR = 20;
 const int MAX_GRAPH = 40000;
 
+typedef char* nodeType;
 struct node {
-    double data;
+    nodeType data;
     node *left, *right;
 };
 
@@ -19,17 +20,17 @@ struct binTree {
 
 binTree *treeConstruct(binTree *);
 
-binTree *treeConstruct(binTree *, double);
+binTree *treeConstruct(binTree *, nodeType);
 
 binTree *treeConstruct(binTree *, node *);
 
-node *nodeConstruct(node *, double);
+node *nodeConstruct(node *, nodeType);
 
 void treeDestruct(binTree *);
 
 void printTree(binTree *);
 
-void treePush(binTree *, double);
+void treePush(binTree *, nodeType);
 
 void treePush(binTree *, node *);
 
