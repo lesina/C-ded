@@ -1,6 +1,8 @@
 #ifndef AKINATOR_BINARY_TREE_H
 #define AKINATOR_BINARY_TREE_H
 
+#include<cstdio>
+
 #define ASSERT_OK(tree) if (!treeOK(tree)) { tree->counter = 0; treeDUMP(tree); exit(-1); } else {tree->counter = 0;}
 
 #define ASSERT_FILE(file) if (!file) { perror("open"); exit(-1); }
@@ -12,6 +14,7 @@ const int MAX_LEN = 255;
 typedef char* nodeType;
 struct node {
     nodeType data;
+    int type;
     node *left, *right;
 };
 

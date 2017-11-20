@@ -4,6 +4,7 @@
 #include <cstring>
 #include <cerrno>
 #include "binary_tree.h"
+#include "differentiator.h"
 
 //---------------------------------------
 //! Allocates the memory for tree
@@ -66,6 +67,13 @@ node *nodeConstruct(node *elem, nodeType data) {
     elem->data = data;
     elem->left = NULL;
     elem->right = NULL;
+    if (!strcmp(data, "x")) {
+        elem->type = VARIABLE;
+    } else if (!strcmp(data, "+") || !strcmp(data, "*") || !strcmp(data, "-")) {
+        elem->type = OPERATOR;
+    } else {
+        elem->type = NUMBER;
+    }
     return elem;
 }
 
@@ -83,12 +91,8 @@ void treeDestruct(binTree *tree) {
     tree->root = elem->right;
     treeDestruct(tree);
     tree->root = elem;
-    free(elem->data);
     free(elem);
     tree->counter++;
-    if (tree->counter == tree->number_of_nodes) {
-        free(tree);
-    }
 }
 
 //---------------------------------------
@@ -233,7 +237,7 @@ void collectTree(binTree *tree, FILE *file) {
     fscanf(file, "%s", word);
     while (strcmp(word, "{") && strcmp(word, ",")) {
         strncat(str, word, MAX_LEN);
-        strncat(str, "_", MAX_LEN);
+//        strncat(str, "_", MAX_LEN);
         fscanf(file, "%s", word);
     }
     if (!strcmp(str, "NULL")) {
@@ -254,7 +258,7 @@ void collectTree(binTree *tree, FILE *file) {
         fscanf(file, "%s", word);
         while (strcmp(word, "{") && strcmp(word, "}")) {
             strncat(str, word, MAX_LEN);
-            strncat(str, "_", MAX_LEN);
+//            strncat(str, "_", MAX_LEN);
             fscanf(file, "%s", word);
         }
 
