@@ -1,6 +1,13 @@
 #include <cstring>
 #include <cassert>
+#include <stdlib.h>
+#include <iostream>
 #include "differentiator.h"
+
+enum answer {
+    OPTIMIZED = 0,
+    OPTIMIZING
+};
 
 //-------------------------------------------
 //! Finds the differential
@@ -10,15 +17,19 @@
 void d(node *n) {
     assert(n);
     if (n->type == NUMBER) {
-        createNode(n, "0");
+        createNode(n, "0", NUMBER);
     } else if (n->type == VARIABLE) {
-        createNode(n, "1");
+        createNode(n, "1", NUMBER);
     } else if (n->type == OPERATOR) {
         if (!strcmp(n->data, "+") || !strcmp(n->data, "-")) {
             d(n->left);
             d(n->right);
         } else if (!strcmp(n->data, "*")) {
-            createNode(n, "+", n->left, n->right);
+            createNodeMul(n, "+", n->left, n->right, OPERATOR);
+        } else if (!strcmp(n->data, "sin")) {
+            n = difficultFunc(n, diffSin);
+        } else if (!strcmp(n->data, "cos")) {
+            n = difficultFunc(n, diffCos);
         }
     }
 }
@@ -29,9 +40,10 @@ void d(node *n) {
 //! \param  [in]    data    new data of the node
 //-----------------------------------------------
 
-void createNode(node *n, nodeType data) {
+void createNode(node *n, nodeType data, int type) {
     assert(n);
     n->data = data;
+    n->type = type;
 }
 
 //-----------------------------------------------
@@ -42,11 +54,10 @@ void createNode(node *n, nodeType data) {
 //! \param  [in]    right   right node of n
 //-----------------------------------------------
 
-void createNode(node *n, nodeType data, node *left, node *right) {
-    assert(n);
+void createNodeMul(node *n, nodeType data, node *left, node *right, int type) {
     assert(left);
     assert(right);
-    n->data = data;
+    createNode(n, data, type);
     node *CL = copy(left);
     node *CR = copy(right);
     n->left = nodeConstruct(n->left, "*");
@@ -82,7 +93,7 @@ node *copy(node *n) {
 
 node *diffSin(node *n) {
     assert(n);
-    createNode(n, "cos");
+    createNode(n, "cos", OPERATOR);
     return n;
 }
 
@@ -94,7 +105,7 @@ node *diffSin(node *n) {
 
 node *diffCos(node *n) {
     assert(n);
-    createNode(n, "*");
+    createNode(n, "*", OPERATOR);
     node *cL = copy(n->left);
     n->left = nodeConstruct(n->left, "-1");
     n->right = nodeConstruct(n->right, "sin");
@@ -109,7 +120,7 @@ node *diffCos(node *n) {
 //! \return result of differential
 //----------------------------------------------------
 
-node *slozhna(node *n, node* (*diff)(node *)) {
+node *difficultFunc(node *n, node *(*diff)(node *)) {
     assert(n);
     assert(diff);
     node *mul = nodeConstruct(mul, "*");
@@ -134,4 +145,98 @@ void printResult(binTree *tree) {
     tree->root = elem->right;
     printResult(tree);
     tree->root = elem;
+}
+
+//---------------------------------------------------
+//! Simplifies the tree
+//! \param  [in]    n   pointer to the node
+//---------------------------------------------------
+
+void optimizer(node *n) {
+    assert(n);
+    int *status = (int *) calloc(1, sizeof(int));
+    do {
+        *status = OPTIMIZED;
+        calculate(n, status);
+        calculateConst(n, status);
+    } while (*status);
+}
+
+//--------------------------------------------------
+//! Simplifies simple expressions
+//! \param  [in]    n       pointer to the node
+//! \param  [in]    status  pointer to the status of simplifying
+//--------------------------------------------------
+
+void calculate(node *n, int *status) {
+    assert(status);
+    node *elem = n;
+    if (!elem->left || !elem->right) return;
+    n = n->left;
+    calculate(n, status);
+    n = elem;
+    if ((!(strcmp(n->left->data, "0")) || !(strcmp(n->right->data, "0"))) && (!strcmp(n->data, "*"))) {
+        createNode(n, "0", NUMBER);
+        n->left = NULL;
+        n->right = NULL;
+        *status = OPTIMIZING;
+    } else if ((!(strcmp(n->left->data, "1")) && (!strcmp(n->data, "*"))) ||
+               (!(strcmp(n->left->data, "0")) && (!strcmp(n->data, "+")))) {
+        createNode(n, n->right->data, n->right->type);
+        n->left = n->right->left;
+        n->right = n->right->right;
+        *status = OPTIMIZING;
+    } else if ((!(strcmp(n->right->data, "1")) && (!strcmp(n->data, "*"))) ||
+               (!(strcmp(n->right->data, "0")) && (!strcmp(n->data, "+"))) ||
+               (!(strcmp(n->right->data, "0")) && (!strcmp(n->data, "-")))) {
+        createNode(n, n->left->data, n->left->type);
+        n->right = n->left->right;
+        n->left = n->left->left;
+        *status = OPTIMIZING;
+    } else if (!(strcmp(n->left->data, "0")) && (!strcmp(n->data, "-"))) {
+        createNode(n, "*", OPERATOR);
+        createNode(n->left, "-1", NUMBER);
+        *status = OPTIMIZING;
+    }
+    if (!elem->left || !elem->right) return;
+    n = n->right;
+    calculate(n, status);
+    n = elem;
+}
+
+//--------------------------------------------------
+//! Simplifying two NUMBER nodes
+//! \param  [in]    n       pointer to the node
+//! \param  [in]    status  pointer to the status of simplifying
+//--------------------------------------------------
+
+void calculateConst(node *n, int *status) {
+    assert(status);
+    node *elem = n;
+    if (!elem->left || !elem->right) return;
+    n = n->left;
+    calculate(n, status);
+    n = elem;
+    if (n->left->type == NUMBER && n->right->type == NUMBER) {
+        int a;
+        int b;
+        a = atoi(n->left->data);
+        b = atoi(n->right->data);
+        if (!strcmp(n->data, "*")) {
+            sprintf(n->data, "%d", a*b);
+            n->left = n->right = NULL;
+        } else if (!strcmp(n->data, "+")) {
+            sprintf(n->data, "%d", a+b);
+            n->left = n->right = NULL;
+        } else if (!strcmp(n->data, "-")) {
+            sprintf(n->data, "%d", a-b);
+            n->left = n->right = NULL;
+        }
+        n->type = NUMBER;
+        *status = OPTIMIZING;
+    }
+    if (!elem->left || !elem->right) return;
+    n = n->right;
+    calculate(n, status);
+    n = elem;
 }

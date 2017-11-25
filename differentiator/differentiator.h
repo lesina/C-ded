@@ -11,20 +11,24 @@ enum types {
 
 void d(node *);
 
-void createNode(node*, nodeType);
+void createNode(node *, nodeType, int);
 
-void createNode(node*, nodeType, node *);
-
-void createNode(node*, nodeType, node *, node *);
+void createNodeMul(node *, nodeType, node *, node *, int);
 
 node *copy(node *);
 
-node *difficultFunc(node *, node *);
+node *difficultFunc(node *, node *(*)(node *));
 
 node *diffSin(node *);
 
 node *diffCos(node *);
 
 void printResult(binTree *);
+
+void optimizer(node *);
+
+void calculateConst(node *, int *);
+
+void calculate(node *, int *);
 
 #endif //DIFFERENTIATOR_DIFFERENTIATOR_H

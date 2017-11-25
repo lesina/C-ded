@@ -287,6 +287,7 @@ void collectTree(binTree *tree, FILE *file) {
 void collectTree(binTree *tree, char *dump) {
     node *elem = tree->root;
     char *str = (char *) calloc(MAX_STR, sizeof(char));
+    assert(str);
     if (!elem) return;
     if (elem->left) {
 //        sprintf(str, "%.2lf", elem->data);
