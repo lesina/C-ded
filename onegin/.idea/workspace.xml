@@ -43,8 +43,8 @@
       <file leaf-file-name="main.cpp" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="180">
-              <caret line="16" column="31" selection-start-line="16" selection-start-column="31" selection-end-line="16" selection-end-column="31" />
+            <state relative-caret-position="72">
+              <caret line="8" column="0" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="69" />
               <folding />
             </state>
           </provider>
@@ -124,10 +124,10 @@
   </component>
   <component name="OCFindUsagesOptions" text="true" ivars="false" properties="true" derivedClasses="false" />
   <component name="ProjectFrameBounds">
-    <option name="x" value="1680" />
-    <option name="y" value="141" />
-    <option name="width" value="1366" />
-    <option name="height" value="740" />
+    <option name="x" value="1676" />
+    <option name="y" value="497" />
+    <option name="width" value="1374" />
+    <option name="height" value="744" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="false">
     <OptionsSetting value="true" id="Add" />
@@ -385,14 +385,16 @@
       <workItem from="1508185145569" duration="554000" />
       <workItem from="1508321441948" duration="11000" />
       <workItem from="1508851342261" duration="10000" />
+      <workItem from="1511874106055" duration="26000" />
+      <workItem from="1511874259772" duration="11000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="51592000" />
+    <option name="totallyTimeSpent" value="51629000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="1680" y="141" width="1366" height="740" extended-state="6" />
+    <frame x="1676" y="497" width="1374" height="744" extended-state="6" />
     <editor active="false" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.16306776" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -838,8 +840,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/main.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="16" column="31" selection-start-line="16" selection-start-column="31" selection-end-line="16" selection-end-column="31" />
+        <state relative-caret-position="72">
+          <caret line="8" column="0" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="69" />
           <folding />
         </state>
       </provider>
